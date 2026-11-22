@@ -1,0 +1,43 @@
+{
+    "name": "davereid/drupal-gitlab-api-docs",
+    "description": "Generates API docs for a Drupal module's MkDocs site with phpDocumentor, including Hooks and Events pages.",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "Drupal",
+        "MkDocs",
+        "phpDocumentor",
+        "API documentation"
+    ],
+    "authors": [
+        {
+            "name": "Dave Reid",
+            "email": "dave@davereid.net"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "phpdocumentor/shim": "^3.10",
+        "saggre/phpdocumentor-markdown": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10 || ^11 || ^12 || ^13"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "DrupalGitlabApiDocs\\Tests\\": "tests/src/"
+        }
+    },
+    "bin": [
+        "bin/drupal-gitlab-api-docs"
+    ],
+    "config": {
+        "allow-plugins": {
+            "phpdocumentor/shim": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit tests"
+    }
+}

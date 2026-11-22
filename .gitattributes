@@ -1,0 +1,7 @@
+/tests export-ignore
+/skills export-ignore
+/phpunit.xml.dist export-ignore
+/.github export-ignore
+/.release-please-manifest.json export-ignore
+/release-please-config.json export-ignore
+/renovate.json export-ignore

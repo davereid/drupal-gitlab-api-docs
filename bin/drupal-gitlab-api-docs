@@ -1,0 +1,54 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * @file
+ * Generates a Drupal module's API docs for MkDocs into docs/api.
+ *
+ * Runs phpDocumentor with saggre/phpdocumentor-markdown's template on the
+ * given paths, then src/fix-api-docs.php on the result, which also writes
+ * docs/hooks.md and docs/events.md. Run it from the
+ * module's root, which has its *.info.yml file. Other options are passed to
+ * phpdoc as they are.
+ *
+ * Usage: drupal-gitlab-api-docs -d src -d <module>.api.php [phpdoc options]
+ */
+
+declare(strict_types=1);
+
+use Composer\InstalledVersions;
+
+require $GLOBALS['_composer_autoload_path'] ?? __DIR__ . '/../vendor/autoload.php';
+
+$args = array_slice($argv, 1);
+if (!in_array('-d', $args, TRUE)) {
+  fwrite(STDERR, "Usage: drupal-gitlab-api-docs -d src -d <module>.api.php [phpdoc options]\n");
+  exit(1);
+}
+
+$infoFile = glob('*.info.yml')[0] ?? '';
+if (!preg_grep('/^--title(=|$)/', $args) && preg_match('/^name: *[\'"]?(.+?)[\'"]?$/m', $infoFile ? file_get_contents($infoFile) : '', $match)) {
+  $args[] = '--title=' . $match[1];
+}
+
+// The pages are generated, never committed: start from an empty directory, so
+// pages for removed classes don't stay behind.
+if (is_dir('docs/api')) {
+  $paths = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('docs/api', FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+  foreach ($paths as $path) {
+    $path->isDir() ? rmdir($path->getPathname()) : unlink($path->getPathname());
+  }
+}
+
+$phpdoc = ($GLOBALS['_composer_bin_dir'] ?? __DIR__ . '/../vendor/bin') . '/phpdoc';
+$template = InstalledVersions::getInstallPath('saggre/phpdocumentor-markdown') . '/themes/markdown';
+$commands = [
+  [$phpdoc, '-t', 'docs/api', "--template=$template", ...$args],
+  [PHP_BINARY, __DIR__ . '/../src/fix-api-docs.php', 'docs/api'],
+];
+foreach ($commands as $command) {
+  passthru(implode(' ', array_map('escapeshellarg', $command)), $code);
+  if ($code !== 0) {
+    exit($code);
+  }
+}
