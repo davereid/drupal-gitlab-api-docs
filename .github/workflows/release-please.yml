@@ -24,8 +24,7 @@ jobs:
       issues: write # Create and update release labels.
       pull-requests: write # Open and update the release pull request.
     steps:
-      # A GitHub App token, not GITHUB_TOKEN, so release PR checks start without approval.
-      # @todo Remove the GITHUB_TOKEN fallback once the App is set up, #2.
+      # A GitHub App token, not GITHUB_TOKEN, so release PR checks start without approval (#2).
       - uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
         id: app-token
         if: vars.RELEASE_PLEASE_CLIENT_ID != ''
